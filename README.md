@@ -34,7 +34,7 @@ SkillShelf is a community-driven Django web application that helps users share s
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/skillshelf.git
+git clone https://github.com/arnii2511/Python_Mini_Project_SkillShelf.git
 cd skillshelf
 ```
 
