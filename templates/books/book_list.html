@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Browse Books - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-center mb-1">Browse Books</h2>
+
+    <form method="GET" class="mb-1">
+        <div class="grid">
+            <div class="form-group">
+                <input type="text" name="q" class="form-control" placeholder="Search books..." value="{{ query }}">
+            </div>
+            <div class="form-group">
+                <select name="genre" class="form-control">
+                    <option value="">All Genres</option>
+                    {% for code, name in genre_choices %}
+                        <option value="{{ code }}" {% if genre == code %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <select name="availability" class="form-control">
+                    <option value="">All Books</option>
+                    <option value="available" {% if availability == 'available' %}selected{% endif %}>Available Only</option>
+                    <option value="borrowed" {% if availability == 'borrowed' %}selected{% endif %}>Currently Borrowed</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{% url 'book_list' %}" class="btn btn-danger ml-1">Clear</a>
+        </div>
+    </form>
+
+    {% if books %}
+        <div class="grid">
+            {% for book in books %}
+                <div class="card">
+                    <h3>{{ book.title }}</h3>
+                    <p><strong>Author:</strong> {{ book.author }}</p>
+                    <p><strong>Genre:</strong> {{ book.get_genre_display }}</p>
+                    <p>{{ book.description|truncatewords:30 }}</p>
+                    <p>
+                        <span class="{% if book.is_available %}success{% else %}error{% endif %}">
+                            {{ book.is_available|yesno:"Available,Currently Borrowed" }}
+                        </span>
+                        {% if book.is_donation %}
+                            <span class="success ml-1">For Donation</span>
+                        {% endif %}
+                    </p>
+                    <div class="text-center">
+                        <a href="{% url 'book_detail' book.pk %}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">No books found matching your criteria.</p>
+    {% endif %}
+</div>
+
+<div class="text-center mt-1">
+    <a href="{% url 'my_books' %}" class="btn btn-primary">My Books</a>
+    <a href="{% url 'add_book' %}" class="btn btn-primary ml-1">Add New Book</a>
+    <a href="{% url 'manage_requests' %}" class="btn btn-primary ml-1">Manage Requests</a>
+</div>
+{% endblock %} 

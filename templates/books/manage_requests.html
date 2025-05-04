@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Manage Requests - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h2>Incoming Requests</h2>
+        {% if incoming_requests %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Requester</th>
+                            <th>Message</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in incoming_requests %}
+                            <tr>
+                                <td>{{ request.book.title }}</td>
+                                <td>{{ request.requester.username }}</td>
+                                <td>{{ request.request_message|truncatewords:20 }}</td>
+                                <td>
+                                    <a href="{% url 'handle_request' request.id 'accept' %}" class="btn btn-primary btn-sm">Accept</a>
+                                    <a href="{% url 'handle_request' request.id 'reject' %}" class="btn btn-danger btn-sm ml-1">Reject</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No incoming requests.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>My Requests</h2>
+        {% if outgoing_requests %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in outgoing_requests %}
+                            <tr>
+                                <td>{{ request.book.title }}</td>
+                                <td>{{ request.book.owner.username }}</td>
+                                <td>{{ request.get_status_display }}</td>
+                                <td>
+                                    <a href="{% url 'book_detail' request.book.pk %}" class="btn btn-primary btn-sm">View Book</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No outgoing requests.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="text-center mt-1">
+    <a href="{% url 'book_list' %}" class="btn btn-primary">Browse Books</a>
+    <a href="{% url 'my_books' %}" class="btn btn-primary ml-1">My Books</a>
+</div>
+{% endblock %} 

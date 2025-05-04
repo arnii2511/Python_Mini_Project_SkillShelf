@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}AI Assistant - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Skill Selection Section -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Select a Skill</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'ai_assistant' %}">
+                        <div class="form-group">
+                            <select name="skill_id" class="form-control" onchange="this.form.submit()">
+                                <option value="">Choose a skill...</option>
+                                {% for skill in user_skills %}
+                                    {% if skill.mode == 'learn' %}
+                                    <option value="{{ skill.id }}" {% if selected_skill.id == skill.id %}selected{% endif %}>
+                                        {{ skill.skill_name }} ({{ skill.mode }})
+                                    </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">AI Assistant</h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Chat Messages -->
+                    <div class="chat-messages" style="height: 400px; overflow-y: auto;">
+                        {% if not selected_skill %}
+                            <div class="alert alert-info m-3">
+                                Please select a skill to start the conversation.
+                            </div>
+                        {% elif days_since_creation < 2 and not start_session %}
+                            <div class="alert alert-warning m-3">
+                                <p>This skill was added less than 2 days ago.</p>
+                                <p>Do you want to:</p>
+                                <div class="d-flex gap-2 mt-2">
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="skill_id" value="{{ selected_skill.id }}">
+                                        <input type="hidden" name="start_session" value="true">
+                                        <button type="submit" class="btn btn-primary">Start Session Anyway</button>
+                                    </form>
+                                    <button onclick="waitForMatches()" class="btn btn-secondary">Wait for Better Matches</button>
+                                </div>
+                            </div>
+                        {% elif days_since_creation >= 2 or start_session %}
+                            {% for message in chat_history %}
+                                <div class="message {% if message.role == 'user' %}user-message{% else %}ai-message{% endif %}">
+                                    <div class="message-header">
+                                        <span class="message-sender">{{ message.role|title }}</span>
+                                        <span class="message-time">{{ message.timestamp }}</span>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ message.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Message Input -->
+                    {% if selected_skill %}
+                        {% if days_since_creation >= 2 or start_session %}
+                            <form method="post" class="message-form p-3 border-top">
+                                {% csrf_token %}
+                                <input type="hidden" name="skill_id" value="{{ selected_skill.id }}">
+                                <div class="input-group">
+                                    <input type="text" name="user_message" class="form-control" placeholder="Type your message..." required>
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-primary">Send</button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-messages {
+        padding: 15px;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        max-width: 85%;
+    }
+    
+    .user-message {
+        margin-left: auto;
+    }
+    
+    .ai-message {
+        margin-right: auto;
+    }
+    
+    .message-header {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+        color: #666;
+    }
+    
+    .message-sender {
+        font-weight: bold;
+    }
+    
+    .message-time {
+        margin-left: 8px;
+    }
+    
+    .user-message .message-content {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 15px 15px 0 15px;
+    }
+    
+    .ai-message .message-content {
+        background-color: #e9ecef;
+        color: #212529;
+        padding: 10px 15px;
+        border-radius: 15px 15px 15px 0;
+    }
+    
+    .message-content {
+        word-wrap: break-word;
+    }
+
+    [data-theme="dark"] .alert-warning {
+        background-color: var(--deep-blue);
+        border-color: var(--bright-blue);
+        color: white;
+    }
+
+    [data-theme="dark"] .btn-secondary {
+        background-color: var(--bright-blue);
+        border-color: var(--light-blue);
+        color: white;
+    }
+
+    [data-theme="dark"] .btn-secondary:hover {
+        background-color: var(--light-blue);
+    }
+</style>
+
+<script>
+    // Scroll to bottom of chat messages
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.querySelector('.chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    function waitForMatches() {
+        // Redirect back to skill list
+        window.location.href = "{% url 'skill_list' %}";
+    }
+</script>
+{% endblock %} 

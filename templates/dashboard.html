@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="dashboard-actions">
+        <a href="{% url 'add_skill' %}" class="btn btn-primary">Add New Skill</a>
+        <a href="{% url 'skill_list' %}" class="btn btn-primary">View All Skills</a>
+        <a href="{% url 'matches' %}" class="btn btn-primary">Find Matches</a>
+    </div>
+
+    <h2>Your Skills</h2>
+    {% if skills %}
+        <div class="grid">
+            {% for skill in skills %}
+                <div class="card">
+                    <h3>{{ skill.name }}</h3>
+                    <p>{{ skill.description }}</p>
+                    <div class="button-group">
+                        <a href="{% url 'edit_skill' skill.id %}" class="btn btn-primary">Edit</a>
+                        <form method="POST" action="{% url 'delete_skill' skill.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You haven't added any skills yet. Start by adding your first skill!</p>
+    {% endif %}
+</div>
+{% endblock %} 

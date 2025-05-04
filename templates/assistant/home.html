@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}AI Study Assistant - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h2>Start a New Learning Session</h2>
+        <p class="mb-1">The AI Assistant can help you learn skills that haven't found a match yet.</p>
+        
+        <h3>Your Unmatched Skills:</h3>
+        <ul class="mb-1">
+            {% for skill in unmatched_skills %}
+                <li>{{ skill.skill_name }} ({{ skill.get_mode_display }})</li>
+            {% endfor %}
+        </ul>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Start Session</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Previous Sessions</h2>
+        {% if sessions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Skill</th>
+                            <th>Goal</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                            <tr>
+                                <td>{{ session.skill_name }}</td>
+                                <td>{{ session.learning_goal|truncatewords:10 }}</td>
+                                <td>{{ session.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'assistant_chat' session.id %}" class="btn btn-primary btn-sm">Continue</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No previous sessions found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

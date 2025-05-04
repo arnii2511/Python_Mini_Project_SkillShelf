@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Profile - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h2 class="text-center mb-1">Profile</h2>
+        <form method="POST" action="{% url 'profile' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <h3>User Information</h3>
+                {% for field in u_form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <h3>Profile Information</h3>
+                {% for field in p_form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-1">
+            <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="text-center mb-1">Help & Support</h2>
+        <div class="help-section">
+            <h3>Getting Started</h3>
+            <ul>
+                <li>Add skills you can teach or want to learn</li>
+                <li>Browse and add books to your collection</li>
+                <li>Connect with other users through skill matches</li>
+                <li>Use the AI assistant for unmatched skills</li>
+            </ul>
+
+            <h3>Profile Management</h3>
+            <ul>
+                <li>Update your username and email</li>
+                <li>Add a bio to tell others about yourself</li>
+                <li>Set your location to find nearby users</li>
+            </ul>
+
+            <h3>Need Help?</h3>
+            <p>If you need assistance or have questions, please contact our support team at:</p>
+            <p class="text-center">
+                <a href="mailto:support@skillshelf.com" class="btn btn-primary">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

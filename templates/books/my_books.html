@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}My Books - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-center mb-1">My Books</h2>
+
+    {% if books %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Genre</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>{{ book.get_genre_display }}</td>
+                            <td>
+                                <span class="{% if book.is_available %}success{% else %}error{% endif %}">
+                                    {{ book.is_available|yesno:"Available,Borrowed" }}
+                                </span>
+                                {% if book.is_donation %}
+                                    <span class="success ml-1">For Donation</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'book_detail' book.pk %}" class="btn btn-primary btn-sm">View</a>
+                                {% if not book.is_available %}
+                                    {% with request=book.get_active_request %}
+                                        {% if request %}
+                                            <a href="{% url 'handle_request' request.id 'return' %}" class="btn btn-primary btn-sm ml-1">Mark Returned</a>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center">You haven't added any books yet.</p>
+    {% endif %}
+</div>
+
+<div class="text-center mt-1">
+    <a href="{% url 'add_book' %}" class="btn btn-primary">Add New Book</a>
+    <a href="{% url 'book_list' %}" class="btn btn-primary ml-1">Browse Books</a>
+    <a href="{% url 'manage_requests' %}" class="btn btn-primary ml-1">Manage Requests</a>
+</div>
+{% endblock %} 

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Chat with AI Assistant - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Learning Session: {{ session.skill_name }}</h2>
+    <p><strong>Goal:</strong> {{ session.learning_goal }}</p>
+</div>
+
+<div class="card">
+    <h3>Chat History</h3>
+    {% if chats %}
+        {% for chat in chats %}
+            <div class="card mb-1">
+                <p><strong>You:</strong></p>
+                <p>{{ chat.question }}</p>
+                <hr>
+                <p><strong>Assistant:</strong></p>
+                <p>{{ chat.response|linebreaks }}</p>
+                <small class="text-muted">{{ chat.created_at|date:"M d, Y H:i" }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No messages yet. Start by asking a question!</p>
+        <p>Try asking about:</p>
+        <ul>
+            <li>A learning roadmap for {{ session.skill_name }}</li>
+            <li>Recommended resources for learning</li>
+            <li>Specific questions about the topic</li>
+        </ul>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Ask a Question</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</div>
+
+<div class="text-center mt-1">
+    <a href="{% url 'assistant' %}" class="btn btn-primary">Back to Assistant Home</a>
+</div>
+{% endblock %} 

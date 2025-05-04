@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }} - SkillShelf{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-center mb-1">{{ book.title }}</h2>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>Book Details</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Genre:</strong> {{ book.get_genre_display }}</p>
+            <p><strong>Owner:</strong> {{ book.owner.username }}</p>
+            <p><strong>Status:</strong>
+                <span class="{% if book.is_available %}success{% else %}error{% endif %}">
+                    {{ book.is_available|yesno:"Available,Currently Borrowed" }}
+                </span>
+                {% if book.is_donation %}
+                    <span class="success ml-1">For Donation</span>
+                {% endif %}
+            </p>
+            <p><strong>Description:</strong></p>
+            <p>{{ book.description }}</p>
+        </div>
+
+        {% if user != book.owner %}
+            <div class="card">
+                <h3>Borrow Request</h3>
+                {% if user_request %}
+                    <p>Your request status: <strong>{{ user_request.get_status_display }}</strong></p>
+                    {% if user_request.request_message %}
+                        <p><strong>Your message:</strong></p>
+                        <p>{{ user_request.request_message }}</p>
+                    {% endif %}
+                {% elif borrow_form %}
+                    <form method="POST" action="{% url 'borrow_request' book.pk %}">
+                        {% csrf_token %}
+                        {% for field in borrow_form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="error">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Send Request</button>
+                    </form>
+                {% else %}
+                    <p>This book is currently not available for borrowing.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="text-center mt-1">
+    {% if user == book.owner %}
+        <a href="{% url 'my_books' %}" class="btn btn-primary">Back to My Books</a>
+    {% else %}
+        <a href="{% url 'book_list' %}" class="btn btn-primary">Back to Book List</a>
+    {% endif %}
+</div>
+{% endblock %} 
