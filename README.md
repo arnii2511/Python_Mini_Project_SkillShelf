@@ -84,6 +84,4 @@ The application will be available at `http://localhost:8000`.
 
 ## License
 
- "# Python_Mini_Project_SkillShelf" 
-"# Python_Mini_Project_SkillShelf" 
-"# Python_Mini_Project_SkillShelf" 
+ # SkillShelf
